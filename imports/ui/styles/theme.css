@@ -1,1 +1,98 @@
-/* theme.css: CSS custom properties for colors, typography, spacing, and border radii */
+:root {
+  /* Backgrounds */
+  --color-bg: #020b13;
+  --color-bg-2: #041420;
+  --color-bg-3: #071e30;
+
+  /* Text */
+  --color-text: #e6f0fa;
+  --color-text-muted: #7a8ea0;
+
+  /* Borders */
+  --color-border: #0d2e4a;
+
+  /* Brand */
+  --color-primary: #1565c0;
+  --color-primary-glow: #1978b2;
+  --color-primary-bright: #47c5f5;
+
+  /* Status */
+  --color-accept: #00897b;
+  --color-decline: #c62828;
+  --color-gold: #f9a825;
+
+  /* Gradients */
+  --gradient-card: linear-gradient(135deg, #041420 0%, #071e30 50%, #041c2e 100%);
+
+  /* Typography */
+  --font-display: 'DM Sans', sans-serif;
+  --font-body: 'Inter', sans-serif;
+  --font-mono: 'JetBrains Mono', monospace;
+
+  /* Border Radius */
+  --radius-sm: 6px;
+  --radius-md: 12px;
+  --radius-lg: 20px;
+  --radius-xl: 28px;
+  --radius-card: 24px;
+
+  /* Transitions */
+  --t-fast: 0.15s ease;
+  --t-normal: 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+  --t-slow: 0.6s ease;
+  --t-swipe: 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+
+  /* Shadows */
+  --shadow-card: 0 8px 32px rgba(0, 0, 0, 0.6), 0 0 1px rgba(13, 46, 74, 0.8);
+  --shadow-card-hover: 0 20px 60px rgba(0, 0, 0, 0.8), 0 0 40px rgba(21, 101, 192, 0.15);
+  --shadow-glow-accept: 0 0 40px rgba(0, 137, 123, 0.35);
+  --shadow-glow-decline: 0 0 40px rgba(198, 40, 40, 0.35);
+  --shadow-glow-gold: 0 0 40px rgba(249, 168, 37, 0.4);
+
+  /* Z-Index */
+  --z-base: 1;
+  --z-overlay: 100;
+  --z-modal: 200;
+  --z-swipe: 250;
+  --z-toast: 300;
+}
+
+@keyframes pulse-glow {
+  0%, 100% {
+    box-shadow: var(--shadow-glow-accept);
+  }
+  50% {
+    box-shadow: none;
+  }
+}
+
+@keyframes swipe-in {
+  from {
+    opacity: 0;
+    transform: scale(0.95) translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1) translateY(0);
+  }
+}
+
+@keyframes fade-up {
+  from {
+    opacity: 0;
+    transform: translateY(30px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes shimmer {
+  from {
+    background-position: -200% center;
+  }
+  to {
+    background-position: 200% center;
+  }
+}
