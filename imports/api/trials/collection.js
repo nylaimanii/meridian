@@ -1,1 +1,6 @@
-// Trials collection: defines and exports the Mongo collection for clinical trial documents
+import { Mongo } from 'meteor/mongo';
+
+const Trials = new Mongo.Collection('trials');
+
+export default Trials;
+export { Trials };
