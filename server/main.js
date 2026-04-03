@@ -1,5 +1,6 @@
 import { Meteor } from 'meteor/meteor';
 import Trials from '../imports/api/trials/collection';
+import '../imports/api/matches/collection';
 import '../imports/api/trials/publications';
 import '../imports/api/matches/methods';
 import '../imports/api/users/methods';

@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { useWindowSize } from '../hooks/useWindowSize';
+import { LiveCounter } from '../components/LiveCounter';
 
 const MOCK_TRIALS = [
   {
@@ -174,26 +175,8 @@ export function Landing() {
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           transition={{ delay: 1.6 }}
-          style={{
-            display: 'flex',
-            alignItems: 'center',
-            gap: '8px',
-          }}
         >
-          <div
-            style={{
-              width: '8px',
-              height: '8px',
-              borderRadius: '50%',
-              background: 'var(--color-accept)',
-              animation: 'pulse-glow 2s ease-in-out infinite',
-              flexShrink: 0,
-            }}
-          />
-          <span style={{ fontSize: '13px', color: 'var(--color-text-muted)' }}>
-            <span style={{ color: 'var(--color-accept)' }}>+</span>
-            {' 14,256 trials. updated live.'}
-          </span>
+          <LiveCounter />
         </motion.div>
       </div>
 

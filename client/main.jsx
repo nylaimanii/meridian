@@ -6,6 +6,7 @@ import { BrowserRouter, Routes, Route } from 'react-router-dom';
 
 import { Landing } from '../imports/ui/pages/Landing';
 import { Login } from '../imports/ui/pages/Login';
+import { Discover } from '../imports/ui/pages/Discover';
 import { AppLayout } from '../imports/ui/layouts/AppLayout';
 import { AuthLayout } from '../imports/ui/layouts/AuthLayout';
 
@@ -39,7 +40,7 @@ Meteor.startup(() => {
           path="/discover"
           element={
             <AppLayout>
-              <div>Discover Page</div>
+              <Discover />
             </AppLayout>
           }
         />
