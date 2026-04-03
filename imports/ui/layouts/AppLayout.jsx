@@ -1,5 +1,7 @@
 import React from 'react';
 import { useWindowSize } from '../hooks/useWindowSize';
+import { SideNav } from '../components/SideNav';
+import { BottomNav } from '../components/BottomNav';
 
 export function AppLayout({ children }) {
   const { width } = useWindowSize();
@@ -7,33 +9,7 @@ export function AppLayout({ children }) {
 
   return (
     <div style={{ minHeight: '100vh', background: 'var(--color-bg)' }}>
-      {isDesktop ? (
-        <div
-          style={{
-            width: '220px',
-            background: 'var(--color-bg-2)',
-            height: '100vh',
-            position: 'fixed',
-            left: 0,
-            top: 0,
-          }}
-        >
-          SideNav
-        </div>
-      ) : (
-        <div
-          style={{
-            position: 'fixed',
-            bottom: 0,
-            left: 0,
-            right: 0,
-            height: '60px',
-            background: 'var(--color-bg-2)',
-          }}
-        >
-          BottomNav
-        </div>
-      )}
+      {isDesktop ? <SideNav /> : <BottomNav />}
 
       <main
         style={{
