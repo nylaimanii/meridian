@@ -8,10 +8,10 @@ Meteor.publish('matches.mine', function () {
 });
 
 Meteor.methods({
-  'matches.save': function (trialId) {
+  'matches.save': async function (trialId) {
     check(trialId, String);
     if (!this.userId) throw new Meteor.Error('not-authorized');
-    SavedMatches.upsert(
+    await SavedMatches.upsertAsync(
       { userId: this.userId, trialId },
       {
         $set: {
@@ -25,10 +25,10 @@ Meteor.methods({
     );
   },
 
-  'matches.pass': function (trialId) {
+  'matches.pass': async function (trialId) {
     check(trialId, String);
     if (!this.userId) throw new Meteor.Error('not-authorized');
-    SavedMatches.upsert(
+    await SavedMatches.upsertAsync(
       { userId: this.userId, trialId },
       {
         $set: {
@@ -42,10 +42,10 @@ Meteor.methods({
     );
   },
 
-  'matches.super': function (trialId) {
+  'matches.super': async function (trialId) {
     check(trialId, String);
     if (!this.userId) throw new Meteor.Error('not-authorized');
-    SavedMatches.upsert(
+    await SavedMatches.upsertAsync(
       { userId: this.userId, trialId },
       {
         $set: {
@@ -59,11 +59,11 @@ Meteor.methods({
     );
   },
 
-  'matches.updateStatus': function (trialId, newStatus) {
+  'matches.updateStatus': async function (trialId, newStatus) {
     check(trialId, String);
     check(newStatus, String);
     if (!this.userId) throw new Meteor.Error('not-authorized');
-    SavedMatches.update(
+    await SavedMatches.updateAsync(
       { userId: this.userId, trialId },
       { $set: { status: newStatus, lastUpdated: new Date() } }
     );

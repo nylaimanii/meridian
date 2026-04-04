@@ -37,7 +37,7 @@ async function syncTrials() {
         syncedAt: new Date(),
       };
 
-      Trials.upsert({ nctId: trialData.nctId }, { $set: trialData });
+      await Trials.upsertAsync({ nctId: trialData.nctId }, { $set: trialData });
     }
 
     console.log(`synced ${studies.length} trials from clinicaltrials.gov`);
