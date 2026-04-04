@@ -5,3 +5,8 @@ _build
 */build-assets
 */build-chunks
 .rsdoctor
+
+# Environment variables — never commit real keys
+.env
+.env.local
+.env.*.local
