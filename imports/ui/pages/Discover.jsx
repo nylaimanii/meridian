@@ -1,44 +1,97 @@
-import React from 'react';
+import React, { useRef } from 'react';
 import { useSubscribe, useTracker } from 'meteor/react-meteor-data';
+import { Meteor } from 'meteor/meteor';
 import { Trials } from '../../api/trials/collection';
+import { SwipeDeck } from '../components/SwipeDeck';
+import { ActionBar } from '../components/ActionBar';
+import { LiveCounter } from '../components/LiveCounter';
 
 export function Discover() {
   const isLoading = useSubscribe('trials.all');
   const trials = useTracker(() => Trials.find({}).fetch());
+  const deckRef = useRef(null);
+
+  function handleSwipeRight(trial) {
+    Meteor.call('matches.save', trial.nctId);
+  }
+
+  function handleSwipeLeft(trial) {
+    Meteor.call('matches.pass', trial.nctId);
+  }
+
+  function handleSuperMatch(trial) {
+    Meteor.call('matches.super', trial.nctId);
+  }
 
   return (
     <div
       style={{
         minHeight: '100vh',
         background: 'var(--color-bg)',
-        color: 'var(--color-text)',
-        padding: '24px',
+        display: 'flex',
+        flexDirection: 'column',
+        alignItems: 'center',
+        padding: '24px 16px',
       }}
     >
-      <h1
+      {/* Header */}
+      <div
         style={{
-          fontFamily: 'var(--font-display)',
-          fontSize: '28px',
-          marginBottom: '24px',
+          display: 'flex',
+          justifyContent: 'space-between',
+          alignItems: 'center',
+          width: '100%',
+          maxWidth: '420px',
+          marginBottom: '16px',
         }}
       >
-        Discover Trials
-      </h1>
+        <span
+          style={{
+            fontFamily: 'var(--font-display)',
+            fontSize: '24px',
+            color: 'var(--color-text)',
+          }}
+        >
+          discover
+        </span>
+        <LiveCounter />
+      </div>
 
-      {isLoading() ? (
-        <p style={{ color: 'var(--color-text-muted)' }}>Loading trials...</p>
+      {/* Deck or loading */}
+      {trials.length === 0 ? (
+        <div
+          style={{
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            height: '400px',
+            color: 'var(--color-text-muted)',
+          }}
+        >
+          loading trials...
+        </div>
       ) : (
         <>
-          <p style={{ color: 'var(--color-text-muted)', marginBottom: '16px' }}>
-            {trials.length} trials loaded
-          </p>
-          <ul style={{ paddingLeft: '20px', display: 'flex', flexDirection: 'column', gap: '8px' }}>
-            {trials.slice(0, 5).map((trial) => (
-              <li key={trial._id} style={{ color: 'var(--color-text)', fontSize: '14px' }}>
-                {trial.title}
-              </li>
-            ))}
-          </ul>
+          <SwipeDeck
+            ref={deckRef}
+            trials={trials}
+            onSwipeRight={handleSwipeRight}
+            onSwipeLeft={handleSwipeLeft}
+            onSuperMatch={handleSuperMatch}
+          />
+          <ActionBar
+            onPass={() => deckRef.current?.handleSwipeLeft()}
+            onSave={() => deckRef.current?.handleSwipeRight()}
+            onSuper={() => {
+              const deck = deckRef.current;
+              if (!deck) return;
+              const currentTrial = trials[0];
+              if (currentTrial) {
+                Meteor.call('matches.super', currentTrial.nctId);
+              }
+              deck.handleSwipeRight();
+            }}
+          />
         </>
       )}
     </div>
