@@ -7,6 +7,9 @@ import { BrowserRouter, Routes, Route } from 'react-router-dom';
 import { Landing } from '../imports/ui/pages/Landing';
 import { Login } from '../imports/ui/pages/Login';
 import { Discover } from '../imports/ui/pages/Discover';
+import { Matches } from '../imports/ui/pages/Matches';
+import { TrialDetail } from '../imports/ui/pages/TrialDetail';
+import { Profile } from '../imports/ui/pages/Profile';
 import { AppLayout } from '../imports/ui/layouts/AppLayout';
 import { AuthLayout } from '../imports/ui/layouts/AuthLayout';
 
@@ -49,7 +52,7 @@ Meteor.startup(() => {
           path="/matches"
           element={
             <AppLayout>
-              <div>Matches Page</div>
+              <Matches />
             </AppLayout>
           }
         />
@@ -58,7 +61,7 @@ Meteor.startup(() => {
           path="/profile"
           element={
             <AppLayout>
-              <div>Profile Page</div>
+              <Profile />
             </AppLayout>
           }
         />
@@ -67,7 +70,7 @@ Meteor.startup(() => {
           path="/trial/:id"
           element={
             <AppLayout>
-              <div>Trial Detail Page</div>
+              <TrialDetail />
             </AppLayout>
           }
         />

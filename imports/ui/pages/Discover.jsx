@@ -1,18 +1,23 @@
-import React, { useRef } from 'react';
+import React, { useRef, useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { useSubscribe, useTracker } from 'meteor/react-meteor-data';
 import { Meteor } from 'meteor/meteor';
 import { Trials } from '../../api/trials/collection';
 import { SwipeDeck } from '../components/SwipeDeck';
 import { ActionBar } from '../components/ActionBar';
 import { LiveCounter } from '../components/LiveCounter';
+import { MatchModal } from '../components/MatchModal';
 
 export function Discover() {
+  const navigate = useNavigate();
   const isLoading = useSubscribe('trials.all');
   const trials = useTracker(() => Trials.find({}).fetch());
   const deckRef = useRef(null);
+  const [matchModalTrial, setMatchModalTrial] = useState(null);
 
   function handleSwipeRight(trial) {
     Meteor.call('matches.save', trial.nctId);
+    setMatchModalTrial(trial);
   }
 
   function handleSwipeLeft(trial) {
@@ -94,6 +99,17 @@ export function Discover() {
           />
         </>
       )}
+
+      {/* Match modal */}
+      <MatchModal
+        isOpen={!!matchModalTrial}
+        trial={matchModalTrial}
+        onClose={() => setMatchModalTrial(null)}
+        onViewTrial={(nctId) => {
+          navigate('/trial/' + nctId);
+          setMatchModalTrial(null);
+        }}
+      />
     </div>
   );
 }
