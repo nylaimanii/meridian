@@ -130,11 +130,11 @@ export const SwipeDeck = forwardRef(function SwipeDeck(
           const isTop = offset === 0;
 
           const matchScore = getMatchScore
-            ? getMatchScore(trial, trialIndex, userCity, userState)
+            ? getMatchScore(trial, trialIndex)
             : defaultMatchScore(trial, trialIndex);
 
           const qualityReasons = getQualityReasons
-            ? getQualityReasons(trial, userCity)
+            ? getQualityReasons(trial)
             : DEFAULT_QUALITY_REASONS;
 
           if (isTop) {
