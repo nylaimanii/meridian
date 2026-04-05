@@ -1,5 +1,5 @@
 import React from 'react';
-import { NavLink } from 'react-router-dom';
+import { NavLink, useNavigate } from 'react-router-dom';
 
 const NAV_ITEMS = [
   {
@@ -43,7 +43,8 @@ const NAV_ITEMS = [
   },
 ];
 
-export function BottomNav() {
+export function BottomNav({ isDemo = false }) {
+  const navigate = useNavigate();
   return (
     <nav
       style={{
@@ -64,7 +65,7 @@ export function BottomNav() {
       {NAV_ITEMS.map(({ to, label, icon }) => (
         <NavLink
           key={label}
-          to={to}
+          to={isDemo ? `${to}?demo=true` : to}
           style={({ isActive }) => ({
             display: 'flex',
             flexDirection: 'column',
@@ -86,6 +87,23 @@ export function BottomNav() {
           </span>
         </NavLink>
       ))}
+      {isDemo && (
+        <button
+          onClick={() => navigate('/login')}
+          style={{
+            background: 'var(--color-primary)',
+            color: 'white',
+            padding: '8px 16px',
+            borderRadius: 'var(--radius-md)',
+            border: 'none',
+            cursor: 'pointer',
+            fontSize: '12px',
+            fontFamily: 'var(--font-body)',
+          }}
+        >
+          sign up free
+        </button>
+      )}
     </nav>
   );
 }

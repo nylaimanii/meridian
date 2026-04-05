@@ -170,6 +170,27 @@ export function Landing() {
           find your match →
         </motion.button>
 
+        {/* Demo button */}
+        <motion.button
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 1.5, duration: 0.8 }}
+          onClick={() => navigate('/discover?demo=true')}
+          style={{
+            background: 'transparent',
+            border: '1px solid var(--color-border)',
+            color: 'var(--color-text-muted)',
+            fontSize: '15px',
+            padding: '12px 28px',
+            borderRadius: 'var(--radius-md)',
+            cursor: 'pointer',
+            fontFamily: 'var(--font-body)',
+            alignSelf: isDesktop ? 'flex-start' : 'center',
+          }}
+        >
+          try a demo →
+        </motion.button>
+
         {/* Live counter */}
         <motion.div
           initial={{ opacity: 0 }}

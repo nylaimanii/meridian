@@ -1,5 +1,5 @@
 import React from 'react';
-import { NavLink } from 'react-router-dom';
+import { NavLink, useNavigate } from 'react-router-dom';
 import { Meteor } from 'meteor/meteor';
 import { useTracker } from 'meteor/react-meteor-data';
 
@@ -45,7 +45,8 @@ const NAV_ITEMS = [
   },
 ];
 
-export function SideNav() {
+export function SideNav({ isDemo = false }) {
+  const navigate = useNavigate();
   const user = useTracker(() => Meteor.user());
   const email = user?.emails?.[0]?.address;
 
@@ -81,7 +82,7 @@ export function SideNav() {
         {NAV_ITEMS.map(({ to, label, icon }) => (
           <NavLink
             key={label}
-            to={to}
+            to={isDemo ? `${to}?demo=true` : to}
             style={({ isActive }) => ({
               display: 'flex',
               alignItems: 'center',
@@ -103,33 +104,55 @@ export function SideNav() {
       </div>
 
       <div style={{ marginTop: 'auto' }}>
-        {email && (
-          <div
+        {isDemo ? (
+          <button
+            onClick={() => navigate('/login')}
             style={{
-              fontSize: '11px',
-              color: 'var(--color-text-muted)',
-              padding: '10px 24px',
-              wordBreak: 'break-all',
+              background: 'var(--color-primary)',
+              color: 'white',
+              padding: '8px 16px',
+              borderRadius: 'var(--radius-md)',
+              border: 'none',
+              cursor: 'pointer',
+              fontSize: '12px',
+              margin: '16px 24px',
+              fontFamily: 'var(--font-body)',
+              display: 'block',
             }}
           >
-            {email}
-          </div>
+            sign up free
+          </button>
+        ) : (
+          <>
+            {email && (
+              <div
+                style={{
+                  fontSize: '11px',
+                  color: 'var(--color-text-muted)',
+                  padding: '10px 24px',
+                  wordBreak: 'break-all',
+                }}
+              >
+                {email}
+              </div>
+            )}
+            <button
+              onClick={() => Meteor.logout()}
+              style={{
+                color: 'var(--color-decline)',
+                fontSize: '12px',
+                padding: '0 24px 24px',
+                background: 'none',
+                border: 'none',
+                cursor: 'pointer',
+                textAlign: 'left',
+                width: '100%',
+              }}
+            >
+              Log out
+            </button>
+          </>
         )}
-        <button
-          onClick={() => Meteor.logout()}
-          style={{
-            color: 'var(--color-decline)',
-            fontSize: '12px',
-            padding: '0 24px 24px',
-            background: 'none',
-            border: 'none',
-            cursor: 'pointer',
-            textAlign: 'left',
-            width: '100%',
-          }}
-        >
-          Log out
-        </button>
       </div>
     </nav>
   );
