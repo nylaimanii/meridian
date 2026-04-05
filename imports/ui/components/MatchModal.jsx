@@ -1,6 +1,5 @@
 import React from 'react';
 import { motion } from 'framer-motion';
-import { useNavigate } from 'react-router-dom';
 
 export function MatchModal({ isOpen, trial, onClose, onViewTrial }) {
   if (!isOpen || !trial) return null;

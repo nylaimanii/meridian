@@ -11,10 +11,19 @@ export function AppLayout({ children }) {
   const isDesktop = width >= 768;
   const location = useLocation();
   const isDemo = new URLSearchParams(location.search).get('demo') === 'true';
-  const user = useTracker(() => Meteor.user());
-  const loggingIn = useTracker(() => Meteor.loggingIn());
 
-  if (!isDemo && !loggingIn && !user) {
+  const { user, loggingIn } = useTracker(() => ({
+    user: Meteor.user(),
+    loggingIn: Meteor.loggingIn(),
+  }));
+
+  // While Meteor is resolving the session, show nothing to avoid flash-redirect
+  if (!isDemo && loggingIn) {
+    return null;
+  }
+
+  // Not demo and no user — redirect to login
+  if (!isDemo && !user) {
     return <Navigate to="/login" replace />;
   }
 
