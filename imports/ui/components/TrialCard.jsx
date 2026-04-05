@@ -1,10 +1,13 @@
 import React from 'react';
-import { motion, useTransform } from 'framer-motion';
+import { motion, useTransform, useMotionValue } from 'framer-motion';
 import { MatchScoreRing } from './MatchScoreRing';
 
 export function TrialCard({ trial, matchScore, qualityReasons, dragX, isTop }) {
+  const fallbackDragX = useMotionValue(0);
+  const activeDragX = isTop && dragX ? dragX : fallbackDragX;
+
   const glowBg = useTransform(
-    dragX || { get: () => 0, onChange: () => {} },
+    activeDragX,
     [-150, 0, 150],
     ['rgba(198,40,40,0.2)', 'rgba(0,0,0,0)', 'rgba(0,137,123,0.2)']
   );
