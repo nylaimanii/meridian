@@ -8,14 +8,23 @@ import React, {
 import { motion, useMotionValue, animate } from 'framer-motion';
 import { TrialCard } from './TrialCard';
 
-function getMatchScore(index) {
+const DEFAULT_QUALITY_REASONS = ['Condition match', 'Location nearby', 'Age eligible'];
+
+function defaultMatchScore(trial, index) {
   return (75 + (index * 7)) % 40 + 60;
 }
 
-const QUALITY_REASONS = ['Condition match', 'Location nearby', 'Age eligible'];
-
 export const SwipeDeck = forwardRef(function SwipeDeck(
-  { trials, onSwipeRight, onSwipeLeft, onSuperMatch },
+  {
+    trials,
+    onSwipeRight,
+    onSwipeLeft,
+    onSuperMatch,
+    userCity,
+    userState,
+    getMatchScore,
+    getQualityReasons,
+  },
   ref
 ) {
   const [currentIndex, setCurrentIndex] = useState(0);
@@ -118,8 +127,15 @@ export const SwipeDeck = forwardRef(function SwipeDeck(
         .map((trial, reversedOffset) => {
           const offset = visibleCards.length - 1 - reversedOffset;
           const trialIndex = currentIndex + offset;
-          const matchScore = getMatchScore(trialIndex);
           const isTop = offset === 0;
+
+          const matchScore = getMatchScore
+            ? getMatchScore(trial, trialIndex, userCity, userState)
+            : defaultMatchScore(trial, trialIndex);
+
+          const qualityReasons = getQualityReasons
+            ? getQualityReasons(trial, userCity)
+            : DEFAULT_QUALITY_REASONS;
 
           if (isTop) {
             return (
@@ -153,7 +169,7 @@ export const SwipeDeck = forwardRef(function SwipeDeck(
                 <TrialCard
                   trial={trial}
                   matchScore={matchScore}
-                  qualityReasons={QUALITY_REASONS}
+                  qualityReasons={qualityReasons}
                   dragX={dragX}
                   isTop={true}
                 />
@@ -181,7 +197,7 @@ export const SwipeDeck = forwardRef(function SwipeDeck(
               <TrialCard
                 trial={trial}
                 matchScore={matchScore}
-                qualityReasons={QUALITY_REASONS}
+                qualityReasons={qualityReasons}
                 dragX={null}
                 isTop={false}
               />

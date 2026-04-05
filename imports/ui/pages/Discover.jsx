@@ -1,4 +1,4 @@
-import React, { useRef, useState } from 'react';
+import React, { useRef, useState, useEffect, useMemo } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { useSubscribe, useTracker } from 'meteor/react-meteor-data';
 import { Meteor } from 'meteor/meteor';
@@ -7,6 +7,48 @@ import { SwipeDeck } from '../components/SwipeDeck';
 import { ActionBar } from '../components/ActionBar';
 import { LiveCounter } from '../components/LiveCounter';
 import { MatchModal } from '../components/MatchModal';
+
+function getTrialCity(trial) {
+  if (!trial.location) return null;
+  return trial.location.split(',')[0].trim().toLowerCase();
+}
+
+function getTrialState(trial) {
+  if (!trial.location) return null;
+  const parts = trial.location.split(',');
+  return parts.length > 1 ? parts[1].trim().toLowerCase() : null;
+}
+
+function getMatchScore(trial, index, userCity, userState) {
+  const trialCity = getTrialCity(trial);
+  const trialState = getTrialState(trial);
+  if (userCity && trialCity && trialCity === userCity.toLowerCase()) {
+    return 85 + (index % 15);
+  }
+  if (userState && trialState && trialState === userState.toLowerCase()) {
+    return 70 + (index % 15);
+  }
+  return (75 + (index * 7)) % 40 + 60;
+}
+
+function getQualityReasons(trial, userCity) {
+  const trialCity = getTrialCity(trial);
+  const locationReason =
+    userCity && trialCity && trialCity === userCity.toLowerCase()
+      ? `Near you · ${trial.location.split(',')[0].trim()}`
+      : 'Location nearby';
+  return ['Condition match', locationReason, 'Age eligible'];
+}
+
+function sortTrialsByLocation(trials, userCity) {
+  if (!userCity) return trials;
+  const city = userCity.toLowerCase();
+  return [...trials].sort((a, b) => {
+    const scoreA = getTrialCity(a) === city ? 0 : a.location ? 1 : 2;
+    const scoreB = getTrialCity(b) === city ? 0 : b.location ? 1 : 2;
+    return scoreA - scoreB;
+  });
+}
 
 export function Discover() {
   const navigate = useNavigate();
@@ -17,6 +59,46 @@ export function Discover() {
   const trials = useTracker(() => Trials.find({}).fetch());
   const deckRef = useRef(null);
   const [matchModalTrial, setMatchModalTrial] = useState(null);
+  const [userCoords, setUserCoords] = useState(null);
+  const [userCity, setUserCity] = useState(null);
+  const [userState, setUserState] = useState(null);
+  const [locationStatus, setLocationStatus] = useState('detecting'); // 'detecting' | 'found' | 'denied'
+
+  useEffect(() => {
+    if (!isDemo) return;
+    if (!navigator.geolocation) {
+      setLocationStatus('denied');
+      return;
+    }
+    navigator.geolocation.getCurrentPosition(
+      async (pos) => {
+        const { latitude: lat, longitude: lon } = pos.coords;
+        setUserCoords({ lat, lon });
+        try {
+          const res = await fetch(
+            `https://nominatim.openstreetmap.org/reverse?lat=${lat}&lon=${lon}&format=json`
+          );
+          const data = await res.json();
+          const addr = data.address || {};
+          const city = addr.city || addr.town || addr.village || addr.county || null;
+          const state = addr.state || null;
+          setUserCity(city);
+          setUserState(state);
+          setLocationStatus('found');
+        } catch {
+          setLocationStatus('denied');
+        }
+      },
+      () => {
+        setLocationStatus('denied');
+      }
+    );
+  }, [isDemo]);
+
+  const sortedTrials = useMemo(() => {
+    if (!isDemo || !userCity) return trials;
+    return sortTrialsByLocation(trials, userCity);
+  }, [trials, isDemo, userCity]);
 
   function handleSwipeRight(trial) {
     if (!isDemo) Meteor.call('matches.save', trial.nctId);
@@ -29,6 +111,13 @@ export function Discover() {
 
   function handleSuperMatch(trial) {
     if (!isDemo) Meteor.call('matches.super', trial.nctId);
+  }
+
+  function bannerText() {
+    if (!isDemo) return null;
+    if (locationStatus === 'detecting') return null; // show pulsing dot instead
+    if (locationStatus === 'found' && userCity) return `showing trials near ${userCity} — swipes won't be saved`;
+    return "you're in demo mode — swipes won't be saved";
   }
 
   return (
@@ -57,8 +146,25 @@ export function Discover() {
             width: '100%',
           }}
         >
-          <span style={{ fontSize: '13px', color: 'var(--color-text-muted)' }}>
-            you're in demo mode — swipes won't be saved
+          <span style={{ fontSize: '13px', color: 'var(--color-text-muted)', display: 'flex', alignItems: 'center', gap: '8px' }}>
+            {locationStatus === 'detecting' ? (
+              <>
+                <span
+                  style={{
+                    width: '6px',
+                    height: '6px',
+                    borderRadius: '50%',
+                    background: 'var(--color-primary-bright)',
+                    display: 'inline-block',
+                    animation: 'pulse-glow 1.5s ease-in-out infinite',
+                    flexShrink: 0,
+                  }}
+                />
+                detecting your location...
+              </>
+            ) : (
+              bannerText()
+            )}
           </span>
           <div style={{ display: 'flex', gap: '8px' }}>
             <button
@@ -128,7 +234,7 @@ export function Discover() {
         </div>
 
         {/* Deck or loading */}
-        {trials.length === 0 ? (
+        {sortedTrials.length === 0 ? (
           <div
             style={{
               display: 'flex',
@@ -144,7 +250,11 @@ export function Discover() {
           <>
             <SwipeDeck
               ref={deckRef}
-              trials={trials}
+              trials={sortedTrials}
+              userCity={userCity}
+              userState={userState}
+              getMatchScore={getMatchScore}
+              getQualityReasons={getQualityReasons}
               onSwipeRight={handleSwipeRight}
               onSwipeLeft={handleSwipeLeft}
               onSuperMatch={handleSuperMatch}
@@ -155,7 +265,7 @@ export function Discover() {
               onSuper={() => {
                 const deck = deckRef.current;
                 if (!deck) return;
-                const currentTrial = trials[0];
+                const currentTrial = sortedTrials[0];
                 if (currentTrial && !isDemo) {
                   Meteor.call('matches.super', currentTrial.nctId);
                 }
