@@ -194,11 +194,11 @@ export const SwipeDeck = forwardRef(function SwipeDeck(
                 pointerEvents: 'none',
               }}
             >
+              {/* No dragX prop for non-top cards — TrialCard uses its internal fallback */}
               <TrialCard
                 trial={trial}
                 matchScore={matchScore}
                 qualityReasons={qualityReasons}
-                dragX={null}
                 isTop={false}
               />
             </motion.div>

@@ -1,23 +1,20 @@
 import React from 'react';
-import { motion, useTransform, useMotionValue } from 'framer-motion';
+import { motion, useMotionValue, useTransform } from 'framer-motion';
 import { MatchScoreRing } from './MatchScoreRing';
 
 export function TrialCard({ trial, matchScore, qualityReasons, dragX, isTop }) {
-  const fallbackDragX = useMotionValue(0);
-  const activeDragX = isTop && dragX ? dragX : fallbackDragX;
+  // ALWAYS create internal fallback — hooks must never be called conditionally
+  const internalDragX = useMotionValue(0);
+  const activeDragX = (isTop && dragX && typeof dragX.on === 'function') ? dragX : internalDragX;
 
-  const glowBg = useTransform(
+  const glowBackground = useTransform(
     activeDragX,
     [-150, 0, 150],
     ['rgba(198,40,40,0.2)', 'rgba(0,0,0,0)', 'rgba(0,137,123,0.2)']
   );
 
   const isRecruiting = trial.status === 'RECRUITING';
-
-  const infoLine = [trial.sponsor, trial.location]
-    .filter(Boolean)
-    .join(' · ');
-
+  const infoLine = [trial.sponsor, trial.location].filter(Boolean).join(' · ');
   const Wrapper = isTop ? motion.div : 'div';
 
   return (
@@ -39,8 +36,8 @@ export function TrialCard({ trial, matchScore, qualityReasons, dragX, isTop }) {
         cursor: isTop ? 'grab' : 'default',
       }}
     >
-      {/* Directional glow overlay */}
-      {isTop && dragX && (
+      {/* Directional glow overlay — always rendered for top card using activeDragX */}
+      {isTop && (
         <motion.div
           style={{
             position: 'absolute',
@@ -48,7 +45,7 @@ export function TrialCard({ trial, matchScore, qualityReasons, dragX, isTop }) {
             borderRadius: 'inherit',
             pointerEvents: 'none',
             zIndex: 1,
-            background: glowBg,
+            background: glowBackground,
           }}
         />
       )}
@@ -84,21 +81,15 @@ export function TrialCard({ trial, matchScore, qualityReasons, dragX, isTop }) {
                 width: '8px',
                 height: '8px',
                 borderRadius: '50%',
-                background: isRecruiting
-                  ? 'var(--color-accept)'
-                  : 'var(--color-text-muted)',
+                background: isRecruiting ? 'var(--color-accept)' : 'var(--color-text-muted)',
                 flexShrink: 0,
-                animation: isRecruiting
-                  ? 'pulse-glow 2s ease-in-out infinite'
-                  : 'none',
+                animation: isRecruiting ? 'pulse-glow 2s ease-in-out infinite' : 'none',
               }}
             />
             <span
               style={{
                 fontSize: '12px',
-                color: isRecruiting
-                  ? 'var(--color-accept)'
-                  : 'var(--color-text-muted)',
+                color: isRecruiting ? 'var(--color-accept)' : 'var(--color-text-muted)',
               }}
             >
               {isRecruiting ? 'recruiting' : 'closed'}
@@ -165,18 +156,9 @@ export function TrialCard({ trial, matchScore, qualityReasons, dragX, isTop }) {
             why you match
           </div>
           {qualityReasons.slice(0, 3).map((reason, i) => (
-            <div
-              key={i}
-              style={{ display: 'flex', alignItems: 'center', gap: '6px' }}
-            >
-              <span
-                style={{ color: 'var(--color-accept)', fontSize: '12px' }}
-              >
-                ✓
-              </span>
-              <span style={{ fontSize: '13px', color: 'var(--color-text)' }}>
-                {reason}
-              </span>
+            <div key={i} style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
+              <span style={{ color: 'var(--color-accept)', fontSize: '12px' }}>✓</span>
+              <span style={{ fontSize: '13px', color: 'var(--color-text)' }}>{reason}</span>
             </div>
           ))}
         </div>
@@ -199,12 +181,8 @@ export function TrialCard({ trial, matchScore, qualityReasons, dragX, isTop }) {
           swipe to decide
         </span>
         <div style={{ display: 'flex', gap: '16px' }}>
-          <span style={{ fontSize: '12px', color: 'var(--color-decline)' }}>
-            ← pass
-          </span>
-          <span style={{ fontSize: '12px', color: 'var(--color-accept)' }}>
-            save →
-          </span>
+          <span style={{ fontSize: '12px', color: 'var(--color-decline)' }}>← pass</span>
+          <span style={{ fontSize: '12px', color: 'var(--color-accept)' }}>save →</span>
         </div>
       </div>
     </Wrapper>
