@@ -166,8 +166,6 @@ export function Discover() {
   const [userCoords, setUserCoords] = useState(null);
   const [userCity, setUserCity] = useState(null);
   const [locationStatus, setLocationStatus] = useState('detecting');
-  const [activeRadius, setActiveRadius] = useState(300);
-
   useEffect(() => {
     if (!isDemo) return;
     if (!navigator.geolocation) { setLocationStatus('denied'); return; }
@@ -191,8 +189,8 @@ export function Discover() {
     );
   }, [isDemo]);
 
-  const { sortedTrials, trialCount } = useMemo(() => {
-    if (!isDemo || !userCoords) return { sortedTrials: trials, trialCount: null };
+  const { sortedTrials, trialCount, activeRadius } = useMemo(() => {
+    if (!isDemo || !userCoords) return { sortedTrials: trials, trialCount: null, activeRadius: 300 };
 
     let filtered = filterAndSortTrials(trials, userCoords, 300);
     let radius = 300;
@@ -200,10 +198,10 @@ export function Discover() {
       filtered = filterAndSortTrials(trials, userCoords, 500);
       radius = 500;
     }
-    setActiveRadius(radius);
     return {
       sortedTrials: filtered.map(({ trial }) => trial),
       trialCount: filtered.length,
+      activeRadius: radius,
     };
   }, [trials, isDemo, userCoords]);
 

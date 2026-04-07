@@ -3,7 +3,10 @@
     "allow": [
       "Bash(powershell -Command ':*)",
       "Bash(powershell -Command \"Test-NetConnection -ComputerName localhost -Port 3000 -InformationLevel Quiet 2>&1\")",
-      "Bash(powershell -Command \"Get-Process -Name 'node','mongod' -ErrorAction SilentlyContinue | Stop-Process -Force; Write-Host 'done'\")"
+      "Bash(powershell -Command \"Get-Process -Name 'node','mongod' -ErrorAction SilentlyContinue | Stop-Process -Force; Write-Host 'done'\")",
+      "Bash(powershell -Command \"Get-Process -Name 'node','mongod' -ErrorAction SilentlyContinue | Stop-Process -Force; Write-Host 'stopped'\")",
+      "Bash(powershell -Command \"Get-Process -Name 'node','mongod' -ErrorAction SilentlyContinue | Stop-Process -Force; Write-Host 'processes stopped'\")",
+      "Bash(powershell -Command \"netstat -ano | findstr :3000\")"
     ]
   }
 }
