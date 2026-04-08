@@ -7,6 +7,7 @@ import { SwipeDeck } from '../components/SwipeDeck';
 import { ActionBar } from '../components/ActionBar';
 import { LiveCounter } from '../components/LiveCounter';
 import { MatchModal } from '../components/MatchModal';
+import { DemoIntakeForm } from '../components/DemoIntakeForm';
 
 // ─── Geo helpers ─────────────────────────────────────────────────────────────
 
@@ -152,6 +153,28 @@ function getQualityReasons(trial, userCoords, userCity) {
   return ['Condition match', locationReason, 'Age eligible'];
 }
 
+// ─── Condition matching helper ────────────────────────────────────────────────
+
+function trialConditionMatch(trial, userConditions) {
+  if (!userConditions || userConditions.length === 0) return null;
+  if (!trial.conditions || trial.conditions.length === 0) return null;
+  const userWords = userConditions.map((c) => c.toLowerCase());
+  for (const trialCond of trial.conditions) {
+    const trialCondLower = trialCond.toLowerCase();
+    for (const userCond of userConditions) {
+      if (trialCondLower.includes(userCond.toLowerCase())) {
+        return userCond;
+      }
+    }
+    for (const word of userWords) {
+      if (trialCondLower.includes(word)) {
+        return userConditions[userWords.indexOf(word)];
+      }
+    }
+  }
+  return null;
+}
+
 // ─── Component ────────────────────────────────────────────────────────────────
 
 export function Discover() {
@@ -166,6 +189,8 @@ export function Discover() {
   const [userCoords, setUserCoords] = useState(null);
   const [userCity, setUserCity] = useState(null);
   const [locationStatus, setLocationStatus] = useState('detecting');
+  const [demoProfile, setDemoProfile] = useState(null);
+
   useEffect(() => {
     if (!isDemo) return;
     if (!navigator.geolocation) { setLocationStatus('denied'); return; }
@@ -198,19 +223,43 @@ export function Discover() {
       filtered = filterAndSortTrials(trials, userCoords, 500);
       radius = 500;
     }
+
+    let result = filtered.map(({ trial }) => trial);
+
+    if (demoProfile?.conditions?.length > 0) {
+      const matched = [];
+      const unmatched = [];
+      for (const trial of result) {
+        if (trialConditionMatch(trial, demoProfile.conditions)) {
+          matched.push(trial);
+        } else {
+          unmatched.push(trial);
+        }
+      }
+      result = [...matched, ...unmatched];
+    }
+
     return {
-      sortedTrials: filtered.map(({ trial }) => trial),
+      sortedTrials: result,
       trialCount: filtered.length,
       activeRadius: radius,
     };
-  }, [trials, isDemo, userCoords]);
+  }, [trials, isDemo, userCoords, demoProfile]);
 
   // Wrap score/reason functions to capture current coords
   function scoreForCard(trial, index) {
-    return getMatchScore(trial, index, userCoords);
+    const base = getMatchScore(trial, index, userCoords);
+    const match = trialConditionMatch(trial, demoProfile?.conditions || []);
+    if (match) return Math.min(99, base + 10);
+    return base;
   }
   function reasonsForCard(trial) {
-    return getQualityReasons(trial, userCoords, userCity);
+    const reasons = getQualityReasons(trial, userCoords, userCity);
+    const match = trialConditionMatch(trial, demoProfile?.conditions || []);
+    if (match) {
+      return [match, reasons[1], reasons[2]];
+    }
+    return reasons;
   }
 
   function handleSwipeRight(trial) {
@@ -269,6 +318,14 @@ export function Discover() {
                 detecting your location...
               </>
             ) : bannerText()}
+            {demoProfile && (
+              <button
+                onClick={() => setDemoProfile(null)}
+                style={{ background: 'none', border: 'none', color: 'var(--color-primary-bright)', fontSize: '12px', cursor: 'pointer', fontFamily: 'var(--font-body)', marginLeft: '8px' }}
+              >
+                edit profile
+              </button>
+            )}
           </span>
           <div style={{ display: 'flex', gap: '8px' }}>
             <button
@@ -310,7 +367,9 @@ export function Discover() {
         </div>
 
         {/* Deck or loading */}
-        {sortedTrials.length === 0 ? (
+        {isDemo && !demoProfile ? (
+          <DemoIntakeForm onSubmit={(profile) => setDemoProfile(profile)} />
+        ) : sortedTrials.length === 0 ? (
           <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', height: '400px', color: 'var(--color-text-muted)' }}>
             {isDemo && locationStatus === 'found' ? 'no trials found nearby' : 'loading trials...'}
           </div>

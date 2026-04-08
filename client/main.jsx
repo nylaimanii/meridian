@@ -12,6 +12,7 @@ import { TrialDetail } from '../imports/ui/pages/TrialDetail';
 import { Profile } from '../imports/ui/pages/Profile';
 import { AppLayout } from '../imports/ui/layouts/AppLayout';
 import { AuthLayout } from '../imports/ui/layouts/AuthLayout';
+import { Onboarding } from '../imports/ui/pages/Onboarding';
 
 Meteor.startup(() => {
   const container = document.getElementById('react-target');
@@ -34,7 +35,7 @@ Meteor.startup(() => {
           path="/onboard"
           element={
             <AppLayout>
-              <div>Onboarding Page</div>
+              <Onboarding />
             </AppLayout>
           }
         />

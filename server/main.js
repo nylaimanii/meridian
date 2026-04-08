@@ -6,7 +6,7 @@ import '../imports/api/matches/methods';
 import '../imports/api/users/methods';
 
 const CLINICAL_TRIALS_URL =
-  'https://clinicaltrials.gov/api/v2/studies?format=json&pageSize=100&filter.overallStatus=RECRUITING&fields=NCTId,BriefTitle,OverallStatus,Phase,LeadSponsorName,LocationCity,LocationState,StartDate,CompletionDate,Condition,BriefSummary';
+  'https://clinicaltrials.gov/api/v2/studies?format=json&pageSize=200&filter.overallStatus=RECRUITING&fields=NCTId,BriefTitle,OverallStatus,Phase,LeadSponsorName,LocationCity,LocationState,StartDate,CompletionDate,Condition,BriefSummary';
 
 async function syncTrials() {
   try {
@@ -16,6 +16,7 @@ async function syncTrials() {
 
     for (const study of studies) {
       const proto = study.protocolSection;
+      if (!proto?.identificationModule?.nctId) continue;
       const locations = proto.contactsLocationsModule?.locations;
       const firstLocation = locations?.[0];
       const city = firstLocation?.city;
