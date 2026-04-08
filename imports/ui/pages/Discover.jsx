@@ -369,7 +369,7 @@ export function Discover() {
         {/* Deck or loading */}
         {isDemo && !demoProfile ? (
           <DemoIntakeForm onSubmit={(profile) => setDemoProfile(profile)} />
-        ) : sortedTrials.length === 0 ? (
+        ) : isLoading() || sortedTrials.length === 0 ? (
           <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', height: '400px', color: 'var(--color-text-muted)' }}>
             {isDemo && locationStatus === 'found' ? 'no trials found nearby' : 'loading trials...'}
           </div>

@@ -12,7 +12,6 @@ export function Login() {
   const [emailFocused, setEmailFocused] = useState(false);
   const [passwordFocused, setPasswordFocused] = useState(false);
   const [btnHovered, setBtnHovered] = useState(false);
-  const [googleHovered, setGoogleHovered] = useState(false);
   const [error, setError] = useState('');
 
   const inputStyle = (focused) => ({
@@ -197,45 +196,6 @@ export function Login() {
         </div>
       )}
 
-      {/* Divider */}
-      <div
-        style={{
-          display: 'flex',
-          alignItems: 'center',
-          gap: '12px',
-          marginBottom: '16px',
-        }}
-      >
-        <hr style={{ flex: 1, borderColor: 'var(--color-border)', borderTop: 'none' }} />
-        <span style={{ fontSize: '12px', color: 'var(--color-text-muted)' }}>or</span>
-        <hr style={{ flex: 1, borderColor: 'var(--color-border)', borderTop: 'none' }} />
-      </div>
-
-      {/* Google button */}
-      <button
-        onClick={() => setError('Google login coming soon')}
-        onMouseEnter={() => setGoogleHovered(true)}
-        onMouseLeave={() => setGoogleHovered(false)}
-        style={{
-          width: '100%',
-          background: 'transparent',
-          border: `1px solid ${googleHovered ? 'var(--color-primary-bright)' : 'var(--color-border)'}`,
-          borderRadius: 'var(--radius-md)',
-          padding: '14px',
-          fontSize: '14px',
-          color: 'var(--color-text-muted)',
-          cursor: 'pointer',
-          fontFamily: 'var(--font-body)',
-          display: 'flex',
-          alignItems: 'center',
-          justifyContent: 'center',
-          gap: '8px',
-          transition: 'border-color 0.15s ease',
-        }}
-      >
-        <span style={{ fontWeight: 700, fontSize: '15px' }}>G</span>
-        Continue with Google
-      </button>
     </motion.div>
   );
 }
