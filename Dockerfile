@@ -1,11 +1,27 @@
-FROM geoffreybooth/meteor-base:3.0 AS builder
+FROM node:20-slim AS builder
 
-COPY . /app/
+# Install system dependencies Meteor needs
+RUN apt-get update && apt-get install -y \
+    curl bash procps python3 build-essential ca-certificates \
+    && rm -rf /var/lib/apt/lists/*
 
-RUN cd /app && meteor npm install --include=dev
+# Install Meteor 3.4
+RUN curl https://install.meteor.com/?release=3.4 | sh
 
-RUN cd /app && meteor build --server-only --directory /built-app --allow-superuser
+ENV PATH="/root/.meteor:$PATH"
 
+WORKDIR /app
+
+# Copy full app (needs .meteor/release present for meteor npm install)
+COPY . .
+
+# Install npm deps including devDependencies (needed for rspack build)
+RUN meteor npm install --include=dev
+
+# Build the Meteor bundle
+RUN meteor build --server-only --directory /built-app --allow-superuser
+
+# ── Runtime stage ──────────────────────────────────────────────────
 FROM node:20-slim
 
 RUN apt-get update && apt-get install -y ca-certificates && rm -rf /var/lib/apt/lists/*
