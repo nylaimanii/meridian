@@ -1,9 +1,9 @@
-FROM geoffreybooth/meteor-base:2.16 AS builder
-
-COPY package*.json /app/
-RUN cd /app && meteor npm install
+FROM geoffreybooth/meteor-base:3.0 AS builder
 
 COPY . /app/
+
+RUN cd /app && meteor npm install --include=dev
+
 RUN cd /app && meteor build --server-only --directory /built-app --allow-superuser
 
 FROM node:20-slim
