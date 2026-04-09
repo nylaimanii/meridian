@@ -653,6 +653,18 @@ export function Landing() {
         </div>
       </motion.div>
 
+      <div style={{ textAlign: 'center', padding: '24px', background: 'var(--color-bg)' }}>
+        <link href="https://fonts.googleapis.com/css2?family=Pacifico&display=swap" rel="stylesheet" />
+        <span style={{
+          fontFamily: "'Pacifico', cursive",
+          fontSize: '15px',
+          color: 'var(--color-text-muted)',
+          opacity: 0.6,
+        }}>
+          nyla 2026 ✨
+        </span>
+      </div>
+
     </div>
   );
 }
