@@ -35,6 +35,8 @@ WORKDIR /app/bundle
 
 ENV PORT=3000
 ENV NODE_ENV=production
+ENV ROOT_URL=https://meridian-production-3414.up.railway.app
+ENV MONGO_URL=mongodb://127.0.0.1:27017/meridian
 
 EXPOSE 3000
 
